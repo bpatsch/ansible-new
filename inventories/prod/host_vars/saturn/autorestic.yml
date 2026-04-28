@@ -1,8 +1,10 @@
 ---
+#
 # Autorestic backup configuration for this host.
 # Secrets (autorestic_key, S3 credentials) are aliased from vault.yml.
 autorestic_configured: true
 
+# main autorestic configuration
 autorestic_config:
   version: 2
 
@@ -97,48 +99,31 @@ autorestic_config:
         - echo "Backup failed for ${AUTORESTIC_LOCATION}"
 
   locations:
-    all:
+    data:
       from:
+        - /home
+        - /var/data
         - /etc
-        - /home/bpatsch
-        - /home/surf
-        - /data/Pictures
-        - /data/surf/.private
+        - /root
+        - /backup
       to:
-        - filerbackup
-      hooks:
-        <<: *global_hooks
-      options:
-        backup:
-          <<: *global_excludes
-      cron: '0 0 * * *'
-
-    hp-data:
-      from:
-        - /etc
-        - /home/bpatsch
-        - /data/Pictures
-      to:
-        - scalewayhp
-        - qnapnas
-      hooks:
-        <<: *global_hooks
-      options:
-        backup:
-          <<: *global_excludes
-      cron: '0 0 * * *'
-
-    google-takeout:
-      from:
-        - /data/google-takeout
-      to:
-        - scalewayhp
-        - qnapnas
-      hooks:
-        <<: *global_hooks
+        - scaleway-s3
       options:
         forget:
-          keep-yearly: 3
+          <<: *global_policies
+        backup:
+          exclude:
+            - '/home/*/Trash'
+            - '/home/Projects/Completed'
+            - '/**.DS_Store'
+            - '**/**Icon?'
+            - '/**.AppleDouble'
+            - '/var/data/bookstack-data/**/'
+      cron: '0 0 * * *'       # Every Day at 0:00
+
+      hooks:
+        <<: *global_hooks
+      options:
         backup:
           <<: *global_excludes
       cron: '0 0 * * *'
@@ -157,4 +142,3 @@ autorestic_config:
         backup:
           option:
             - s3.storage-class=ONEZONE_IA
-
