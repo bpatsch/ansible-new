@@ -1,0 +1,44 @@
+---
+metrics: true
+
+storage:
+  type: sqlite
+  path: /data/data.db
+  maximum-number-of-results: 3000
+  maximum-number-of-events: 20
+
+ui:
+  title: CASA Availability monitoring
+
+
+{% if alerting is defined %}
+alerting:
+  {{ alerting | to_nice_yaml(indent=2) | indent(2) }}
+{% endif %}
+
+
+endpoints:
+{% for g in gatus_endpoint_groups %}
+{% for host in g.hosts %}
+  - name: {{ host }}
+    group: {{ g.name }}
+    url: "{{ g.url_scheme }}://{{ host }}"
+    interval: {{ g.interval }}
+    conditions:
+{% if g.response_time is defined %}
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < {{ g.response_time }}"
+      - "[CERTIFICATE_EXPIRATION] > 336h"
+{% else %}
+{% for condition in g.conditions %}
+      - "{{ condition }}"
+{% endfor %}
+{% endif %}
+{% if g.alerts is defined %}
+    alerts:
+{# sort_keys=False preserves host_vars insertion order; gatus requires 'type' as the first key in each alert entry #}
+{{ g.alerts | to_nice_yaml(indent=2, sort_keys=False) | indent(6, first=True) }}
+{% endif %}
+
+{% endfor %}
+{% endfor %}
