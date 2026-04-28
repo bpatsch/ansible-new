@@ -2,7 +2,7 @@
 # Common role defaults — override in group_vars or host_vars.
 
 # SSH hardened port (set to 22 if you don't want to change it)
-ssh_port: 2222
+ssh_port: 22
 
 # Non-root admin user created during bootstrap
 admin_user: ansible

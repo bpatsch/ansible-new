@@ -1,4 +1,8 @@
 ---
+- name: Import packages tasks
+  ansible.builtin.import_tasks: packages.yml
+  tags: [common, bootstrap, packages]
+
 - name: Import users tasks
   ansible.builtin.import_tasks: users.yml
   tags: [common, bootstrap, users]
@@ -10,10 +14,6 @@
 - name: Import firewall tasks
   ansible.builtin.import_tasks: firewall.yml
   tags: [common, bootstrap, firewall]
-
-- name: Import packages tasks
-  ansible.builtin.import_tasks: packages.yml
-  tags: [common, packages]
 
 - name: Import updates tasks
   ansible.builtin.import_tasks: updates.yml

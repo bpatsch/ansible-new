@@ -24,6 +24,7 @@ common_packages:
   - locales
   - needrestart
   - unattended-upgrades
+  - cron
 
 admin_user: ansible
 
