@@ -1,0 +1,48 @@
+---
+# Common role defaults — override in group_vars or host_vars.
+
+# SSH hardened port (set to 22 if you don't want to change it)
+ssh_port: 2222
+
+# Non-root admin user created during bootstrap
+admin_user: ansible
+
+# UFW default policy
+ufw_default_incoming: deny
+ufw_default_outgoing: allow
+ufw_allowed_ports:
+  - "{{ ssh_port }}"
+  - "80"
+  - "443"
+
+# fail2ban
+fail2ban_bantime: 3600
+
+# Packages: base list is in group_vars/all/vars.yml; per-host extras go in extra_packages.
+extra_packages: []
+
+# System locale and timezone
+system_locales:
+  - en_US.UTF-8
+  - de_DE.UTF-8
+system_timezone: Europe/Vienna
+
+# msmtp
+run_msmtp_mailer: true
+msmtp_send_test_mail: false
+msmtp_default_account: "google-mail"
+msmtp_alias_default: "{{ smtp_auth_user | default('root@localhost') }}"
+msmtp_alias_root: "{{ smtp_auth_user | default('root@localhost') }}"
+msmtp_log: "syslog"
+msmtp_test_mail_recipient: "{{ smtp_auth_user | default('root@localhost') }}"
+msmtp_accounts:
+  - account: google-mail
+    host: smtp.gmail.com
+    port: 587
+    auth: "on"
+    from: "{{ smtp_auth_user | default('') }}"
+    user: "{{ smtp_auth_user | default('') }}"
+    password: "{{ smtp_auth_pass | default('') }}"
+
+# healthchecks.io UUID for backup ping (set in host_vars vault)
+healthchecks_uuid: ""

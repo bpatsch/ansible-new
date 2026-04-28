@@ -1,0 +1,10 @@
+---
+services:
+  gatus:
+    image: twinproduction/gatus:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/data/containers/gatus/data:/data
+      - /var/data/config/gatus/config.yml:/config/config.yml:ro

@@ -1,0 +1,73 @@
+---
+# Base package list installed on every host. Extend per-host/group with extra_packages.
+common_packages:
+  - vim
+  - htop
+  - curl
+  - wget
+  - rsync
+  - git
+  - zsh
+  - zip
+  - unzip
+  - nfs-common
+  - jq
+  - tcpdump
+  - tree
+  - locate
+  - ufw
+  - sudo
+  - chrony
+  - fail2ban
+  - figlet
+  - ruby
+  - locales
+  - needrestart
+  - unattended-upgrades
+
+admin_user: ansible
+
+# msmtp — secrets aliased from vault
+smtp_auth_user: "{{ vault_smtp_auth_user }}"
+smtp_auth_pass: "{{ vault_smtp_auth_pass }}"
+
+msmtp_default_account: "google-mail"
+msmtp_alias_default: "{{ smtp_auth_user }}"
+msmtp_alias_root: "{{ smtp_auth_user }}"
+msmtp_log: "syslog"
+msmtp_send_test_mail: false
+msmtp_test_mail_recipient: "{{ smtp_auth_user }}"
+msmtp_accounts:
+  - account: google-mail
+    host: smtp.gmail.com
+    port: 587
+    auth: "on"
+    from: "{{ smtp_auth_user }}"
+    user: "{{ smtp_auth_user }}"
+    password: "{{ smtp_auth_pass }}"
+
+# autorestic — secret aliased from vault; used as autorestic_config.extras.key
+autorestic_key: "{{ vault_autorestic_key }}"
+healthchecks_uuid: "{{ vault_healthchecks_uuid }}"
+
+# autorestic role install parameters (dbrennand.autorestic)
+autorestic_version: "1.8.3"
+autorestic_restic_version: "0.17.3"
+autorestic_install_directory:
+  path: /usr/local/bin
+  mode: "755"
+autorestic_restic_install_directory:
+  path: /usr/local/bin
+  mode: "755"
+autorestic_info: false
+autorestic_check: false
+# autorestic_config is set per-host in host_vars (paths and backends differ per machine)
+
+# fail2ban defaults
+fail2ban_bantime: 3600
+
+# Locale list
+system_locales:
+  - en_US.UTF-8
+  - de_DE.UTF-8
+system_timezone: Europe/Vienna

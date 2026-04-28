@@ -1,0 +1,17 @@
+# Galaxy-installed roles and collections (reinstall with: make requirements)
+roles/dbrennand.autorestic/
+roles/chriswayg.msmtp-mailer/
+
+# Ansible retry files
+*.retry
+
+# Cache
+.cache/
+.ansible/
+
+# Unencrypted vault files — never commit these
+# (vault.yml files ARE committed but must be encrypted first)
+*.vault_pass
+
+# OS
+.DS_Store

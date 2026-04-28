@@ -1,0 +1,10 @@
+---
+- name: "Restart {{ stack_name }}"
+  community.docker.docker_compose_v2:
+    project_src: "/var/data/config/{{ stack_name }}"
+    state: restarted
+
+- name: Reload Caddy
+  ansible.builtin.systemd:
+    name: caddy
+    state: reloaded

@@ -1,0 +1,16 @@
+---
+ansible_user: ansible
+ansible_port: 2222
+ansible_become: true
+
+stacks:
+  - paperless-ngx
+  - gatus
+
+paperless_ngx:
+  domain: paperless.test.example.com
+  admin_email: bernhard.patsch@gmail.com
+  admin_password: "{{ vault_paperless_admin_password }}"
+
+gatus:
+  domain: status.test.example.com

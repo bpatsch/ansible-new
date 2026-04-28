@@ -1,0 +1,32 @@
+---
+- name: Deploy autorestic hooks script
+  ansible.builtin.template:
+    src: autorestic_hooks.sh.j2
+    dest: /usr/local/bin/autorestic_hooks.sh
+    mode: "0755"
+
+- name: Install and configure autorestic
+  ansible.builtin.import_role:
+    name: dbrennand.autorestic
+
+- name: Copy backup wrapper script
+  ansible.builtin.copy:
+    src: bin/backup-wrapper.sh
+    dest: /usr/local/bin/backup-wrapper.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create /var/opt/backup directory
+  ansible.builtin.file:
+    path: /var/opt/backup
+    state: directory
+    mode: "0700"
+
+- name: Create autorestic backup cron job
+  ansible.builtin.cron:
+    name: autorestic backup
+    hour: "0"
+    minute: "30"
+    job: /usr/local/bin/backup-wrapper.sh 2>&1 | logger -t backup-wrapper
+    state: present

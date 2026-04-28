@@ -1,0 +1,15 @@
+---
+- name: Install and configure msmtp
+  ansible.builtin.import_role:
+    name: chriswayg.msmtp-mailer
+  when: run_msmtp_mailer | bool
+
+- name: Send test mail
+  ansible.builtin.shell: >-
+    echo "Test mail from msmtp on {{ inventory_hostname }}\n\n$(uname -a)" |
+    mail -s "Test mSMTP at $(hostname -f)" root "{{ msmtp_test_mail_recipient }}"
+  when: run_msmtp_mailer | bool and msmtp_send_test_mail | bool
+  tags: mail
+  async: 30
+  poll: 5
+  changed_when: false

@@ -1,0 +1,6 @@
+---
+- name: Perform dist-upgrade
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true
+  when: ansible_facts['os_family'] in ['Debian', 'Ubuntu']

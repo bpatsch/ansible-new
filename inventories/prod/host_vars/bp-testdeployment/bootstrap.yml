@@ -1,0 +1,4 @@
+---
+ansible_user: bpatsch
+ansible_port: 22
+ansible_become: true

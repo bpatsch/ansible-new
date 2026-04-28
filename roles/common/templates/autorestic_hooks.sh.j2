@@ -1,0 +1,25 @@
+#!/bin/bash
+UUID="{{ healthchecks_uuid }}"
+
+success() {
+    echo "Backup successful for $AUTORESTIC_LOCATION"
+    echo "Updating hc-ping with UUID \"$UUID\""
+    curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/$UUID && echo "Updating hc-ping: success"
+}
+
+failure() {
+    echo "Backup failed for $AUTORESTIC_LOCATION"
+    echo "Updating hc-ping with UUID \"$UUID\""
+    curl -fsS -m 10 --retry 5 -o /dev/null https://hc-ping.com/$UUID/fail && echo "Updating hc-ping: failure"
+}
+
+
+if [[ $1 == "success" ]]; then
+    success
+elif [[ $1 == "failure" ]]; then
+    failure
+else
+    echo "Unkown argument. Exiting."
+    exit 1
+fi
+

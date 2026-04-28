@@ -1,0 +1,22 @@
+---
+- name: Setup passwordless sudo for sudo group
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/80-ansible-sudo-group
+    content: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    mode: "0440"
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Create admin user
+  ansible.builtin.user:
+    name: "{{ admin_user }}"
+    state: present
+    groups: sudo
+    shell: /bin/bash
+    append: true
+    create_home: true
+
+- name: Add SSH authorized key for admin user
+  ansible.posix.authorized_key:
+    user: "{{ admin_user }}"
+    state: present
+    key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"

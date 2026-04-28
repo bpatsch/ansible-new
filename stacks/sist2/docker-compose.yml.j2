@@ -1,0 +1,10 @@
+---
+services:
+  sist2:
+    image: simon987/sist2:latest
+    restart: unless-stopped
+    ports:
+      - "4090:4090"
+    volumes:
+      - /var/data/containers/sist2/data:/sist2_data
+      - /var/data/containers/sist2/index:/index

@@ -1,0 +1,35 @@
+---
+- name: Ensure /usr/local/bin exists
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy scripts to /usr/local/bin
+  ansible.builtin.copy:
+    src: "bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - kuma
+    - shutdown_once_download_finished.py
+
+- name: Deploy MOTD scripts
+  ansible.builtin.copy:
+    src: "etc/update-motd.d/{{ item }}"
+    dest: /etc/update-motd.d/
+    mode: "0755"
+  loop:
+    - 10-hostname
+    - 20-sysinfo
+    - 30-apt
+
+- name: Clear /etc/motd static file
+  ansible.builtin.copy:
+    content: ""
+    dest: /etc/motd
+    mode: "0644"

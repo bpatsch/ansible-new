@@ -1,0 +1,8 @@
+---
+- name: Configure unattended-upgrades to enable automatic security updates
+  ansible.builtin.debconf:
+    name: unattended-upgrades
+    question: unattended-upgrades/enable_auto_updates
+    vtype: boolean
+    value: 'true'
+  when: ansible_facts['os_family'] in ['Debian', 'Ubuntu']

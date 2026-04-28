@@ -1,0 +1,9 @@
+---
+services:
+  beszel:
+    image: henrygd/beszel:latest
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - /var/data/containers/beszel/data:/beszel_data

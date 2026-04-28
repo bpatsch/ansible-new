@@ -1,0 +1,9 @@
+---
+# First-run playbook: connects as root on port 22, applies only the bootstrap cross-cut.
+# Connection vars are passed via --extra-vars "@host_vars/<HOST>/bootstrap.yml".
+- name: Bootstrap fresh host (users, ssh, firewall only)
+  hosts: "{{ target | default('all') }}"
+  gather_facts: true
+  roles:
+    - role: common
+      tags: [bootstrap]

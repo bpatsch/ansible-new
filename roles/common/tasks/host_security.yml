@@ -1,0 +1,28 @@
+---
+- name: Install INN-DEV SSL interception CA certificate
+  ansible.builtin.copy:
+    src: usr/local/share/ca-certificates/INN-DEV.crt
+    dest: /usr/local/share/ca-certificates/INN-DEV.crt
+    mode: "0644"
+
+- name: Update trusted CA certificates
+  ansible.builtin.command: /usr/sbin/update-ca-certificates
+  changed_when: false
+  when: ansible_os_family == "Debian"
+
+- name: Deploy fail2ban jail config for sshd
+  ansible.builtin.template:
+    src: jail_sshd.local.j2
+    dest: /etc/fail2ban/jail.d/jail_sshd.local
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    fail2ban_enabled: true
+  notify: Restart fail2ban
+
+- name: Enable and start fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    enabled: true
+    state: started

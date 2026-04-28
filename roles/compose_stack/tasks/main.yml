@@ -1,0 +1,35 @@
+---
+- name: Create stack directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "/var/data/config/{{ stack_name }}"
+    - "/var/data/containers/{{ stack_name }}"
+
+- name: Render compose file
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../stacks/{{ stack_name }}/docker-compose.yml.j2"
+    dest: "/var/data/config/{{ stack_name }}/docker-compose.yml"
+    mode: "0644"
+  notify: "Restart {{ stack_name }}"
+
+- name: Render env file
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../stacks/{{ stack_name }}/env.j2"
+    dest: "/var/data/config/{{ stack_name }}/.env"
+    mode: "0600"
+  notify: "Restart {{ stack_name }}"
+
+- name: Drop caddy snippet for stack
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../stacks/{{ stack_name }}/caddy.j2"
+    dest: "/etc/caddy/sites/{{ stack_name }}.caddy"
+    mode: "0644"
+  notify: Reload Caddy
+
+- name: Bring stack up
+  community.docker.docker_compose_v2:
+    project_src: "/var/data/config/{{ stack_name }}"
+    state: present

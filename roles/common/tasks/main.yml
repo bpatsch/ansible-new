@@ -1,0 +1,40 @@
+---
+- name: Import users tasks
+  ansible.builtin.import_tasks: users.yml
+  tags: [common, bootstrap, users]
+
+- name: Import ssh tasks
+  ansible.builtin.import_tasks: ssh.yml
+  tags: [common, bootstrap, ssh]
+
+- name: Import firewall tasks
+  ansible.builtin.import_tasks: firewall.yml
+  tags: [common, bootstrap, firewall]
+
+- name: Import packages tasks
+  ansible.builtin.import_tasks: packages.yml
+  tags: [common, packages]
+
+- name: Import updates tasks
+  ansible.builtin.import_tasks: updates.yml
+  tags: [common, updates]
+
+- name: Import auto_security tasks
+  ansible.builtin.import_tasks: auto_security.yml
+  tags: [common, auto_security]
+
+- name: Import msmtp tasks
+  ansible.builtin.import_tasks: msmtp.yml
+  tags: [common, msmtp]
+
+- name: Import backup tasks
+  ansible.builtin.import_tasks: backup.yml
+  tags: [common, backup]
+
+- name: Import host_security tasks
+  ansible.builtin.import_tasks: host_security.yml
+  tags: [common, host_security]
+
+- name: Import scripts tasks
+  ansible.builtin.import_tasks: scripts.yml
+  tags: [common, scripts]

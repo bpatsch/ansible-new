@@ -1,0 +1,37 @@
+---
+- name: Update apt package index
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 86400
+  when: ansible_facts['os_family'] in ['Debian', 'Ubuntu']
+
+- name: Install base and extra packages
+  ansible.builtin.package:
+    name: "{{ common_packages + (extra_packages | default([])) }}"
+    state: present
+
+- name: Setup locales
+  community.general.locale_gen:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ system_locales }}"
+  when: ansible_facts['os_family'] in ['Debian', 'Ubuntu']
+
+- name: Set system timezone
+  community.general.timezone:
+    name: "{{ system_timezone }}"
+
+- name: Ensure chrony is running
+  ansible.builtin.service:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Enforce initial time sync
+  ansible.builtin.command: /usr/bin/chronyc -a makestep
+  changed_when: false
+  ignore_errors: true
+
+- name: Show if reboot is required
+  ansible.builtin.debug:
+    msg: "{{ lookup('file', '/var/run/reboot-required', errors='ignore') }}"

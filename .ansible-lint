@@ -1,0 +1,20 @@
+---
+profile: basic
+
+exclude_paths:
+  - .cache/
+  - .github/
+  - common/
+  - deploy-scripts/
+  - to_migrate/
+  - roles/autorestic/
+  - roles/msmtp/
+  - roles/dbrennand.autorestic/
+  - roles/chriswayg.msmtp-mailer/
+  - inventories/*/group_vars/*/vault.yml
+  - inventories/*/host_vars/*/vault.yml
+
+skip_list:
+  - role-name
+  - var-naming[no-role-prefix]
+  - yaml[line-length]

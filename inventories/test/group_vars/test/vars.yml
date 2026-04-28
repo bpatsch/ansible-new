@@ -1,0 +1,3 @@
+---
+environment_name: test
+msmtp_send_test_mail: false

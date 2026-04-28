@@ -1,0 +1,14 @@
+---
+ansible_user: ansible
+ansible_port: 2222
+ansible_become: true
+
+stacks:
+  - gatus
+
+gatus:
+  domain: status.example.com
+
+# Scaleway S3 credentials — aliased from vault
+scaleway_access_key_id: "{{ vault_scaleway_access_key_id }}"
+scaleway_secret_access_key: "{{ vault_scaleway_secret_access_key }}"

@@ -1,0 +1,159 @@
+---
+# Autorestic backup configuration for this host.
+# Secrets (autorestic_key, S3 credentials) are aliased from vault.yml.
+
+autorestic_config:
+  version: 2
+
+  global:
+    forget:
+      keep-last: 5
+      keep-daily: 7
+      keep-weekly: 4
+      keep-monthly: 12
+
+  extras:
+    key: &global_key "{{ autorestic_key }}"
+    backup: &global_excludes
+      exclude:
+        - '/home/*/Trash'
+        - '/home/Projects/Completed'
+        - '/**.DS_Store'
+        - '**/**Icon?'
+        - '/**.AppleDouble'
+        - '/**.cache'
+        - '**/__pycache__/**'
+        - '/dev'
+        - '/lost+found'
+        - '/media'
+        - '/mnt'
+        - '/proc'
+        - '/run'
+        - '/sys'
+        - '/tmp'
+        - '/var/spool'
+        - '/var/run'
+        - '/var/tmp'
+        - '/var/log'
+        - '*.swp'
+        - '/boot'
+        - '/lib'
+        - '/lib64'
+        - '/bin/'
+        - '/sbin/'
+        - '/usr/sbin'
+        - '.cache'
+        - 'cache'
+        - '/dev/*'
+        - '/home/*/.bash_history'
+        - '/home/*/.cache/chromium'
+        - '/home/*/.config/chromium/*/Service Worker/'
+        - '/home/*/.local/share/Trash'
+        - '/home/*/.mozilla/firefox/*/Cache'
+        - '/home/*/Documents/Exclude/*'
+        - '/lib/modules/*/volatile/.mounted'
+        - '/media/*'
+        - '/mnt/*'
+        - '/proc/*'
+        - '/run/*'
+        - '/tmp/*'
+        - '/sys/*'
+        - '/var/cache/apt/archives/*'
+        - '/var/lock/*'
+        - '/var/run/*'
+        - '/var/tmp/*'
+        - '/var/lib/lxcfs/*'
+        - '**~'
+        - '**.bak'
+        - '**.cache'
+        - '**cache**'
+        - '**debuginfo**'
+        - '**duplicity-**'
+        - '**Trash**'
+        - '**.iso'
+        - '**/.cache/**'
+        - '**/Cache/**'
+        - '/home/*/Downloads/**'
+        - '**/BUILD/**'
+        - '**/temp/**'
+        - '**/.thumbnails/**'
+        - '**/.beagle/**'
+        - '**/venv/**'
+        - '**.vdi'
+        - '**.vmdk'
+        - 'home/*/.vagrant.d/**'
+        - '/data/.plain/**'
+
+    hooks: &global_hooks
+      before:
+        - echo "Starting backup for ${AUTORESTIC_LOCATION}"
+      after:
+        - echo "Backup successful for ${AUTORESTIC_LOCATION}"
+      success:
+        - /usr/local/bin/autorestic_hooks.sh success
+        - echo "Backup successful for ${AUTORESTIC_LOCATION}"
+      failure:
+        - echo "Backup failed for ${AUTORESTIC_LOCATION}"
+
+  locations:
+    all:
+      from:
+        - /etc
+        - /home/bpatsch
+        - /home/surf
+        - /data/Pictures
+        - /data/surf/.private
+      to:
+        - filerbackup
+      hooks:
+        <<: *global_hooks
+      options:
+        backup:
+          <<: *global_excludes
+      cron: '0 0 * * *'
+
+    hp-data:
+      from:
+        - /etc
+        - /home/bpatsch
+        - /data/Pictures
+      to:
+        - scalewayhp
+        - qnapnas
+      hooks:
+        <<: *global_hooks
+      options:
+        backup:
+          <<: *global_excludes
+      cron: '0 0 * * *'
+
+    google-takeout:
+      from:
+        - /data/google-takeout
+      to:
+        - scalewayhp
+        - qnapnas
+      hooks:
+        <<: *global_hooks
+      options:
+        forget:
+          keep-yearly: 3
+        backup:
+          <<: *global_excludes
+      cron: '0 0 * * *'
+
+  backends:
+    scaleway-s3:
+      type: s3
+      path: s3.nl-ams.scw.cloud/saturn-oracle-b5393dbe-a0aa-41f3-ae7b-49078a4fcf6b/saturn-autorestic
+      key: "{{ vault_autorestic_key }}"
+      env:
+        AWS_ACCESS_KEY_ID: "{{ vault_scaleway_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{ vault_scaleway_secret_access_key }}"
+      forgetoption: {}
+      options:
+        all:
+        backup:
+          option:
+            - s3.storage-class=ONEZONE_IA
+

@@ -1,0 +1,16 @@
+---
+- name: Apply docker/caddy/stacks to docker hosts
+  hosts: docker_hosts
+  gather_facts: true
+  roles:
+    - common
+    - docker
+    - caddy
+  tasks:
+    - name: Deploy stacks declared on this host
+      ansible.builtin.include_role:
+        name: compose_stack
+      vars:
+        stack_name: "{{ item }}"
+      loop: "{{ stacks | default([]) }}"
+      tags: ["{{ item }}", stacks]

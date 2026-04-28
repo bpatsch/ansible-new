@@ -1,0 +1,3 @@
+---
+# Test inventory overrides — inherits prod structure but uses test secrets
+environment_name: test

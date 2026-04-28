@@ -1,0 +1,9 @@
+[DEFAULT]
+bantime = {{ fail2ban_bantime }}
+banaction = iptables-multiport
+banaction_allports = iptables-allports
+
+[sshd]
+enabled = true
+maxretry = 5
+findtime = 600

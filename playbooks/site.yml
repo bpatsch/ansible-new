@@ -1,0 +1,6 @@
+---
+- name: Apply common role to all hosts
+  import_playbook: common.yml
+
+- name: Apply docker/caddy/stacks to docker_hosts
+  import_playbook: docker_hosts.yml
