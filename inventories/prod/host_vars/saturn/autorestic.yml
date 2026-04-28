@@ -1,6 +1,7 @@
 ---
 # Autorestic backup configuration for this host.
 # Secrets (autorestic_key, S3 credentials) are aliased from vault.yml.
+autorestic_configured: true
 
 autorestic_config:
   version: 2

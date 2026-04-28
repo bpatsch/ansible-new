@@ -46,3 +46,7 @@ msmtp_accounts:
 
 # healthchecks.io UUID for backup ping (set in host_vars vault)
 healthchecks_uuid: ""
+
+# Set to true in host_vars when autorestic_config is defined for this host.
+# Backup tasks are skipped (or fail) unless this is explicitly enabled.
+autorestic_configured: false

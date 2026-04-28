@@ -1,11 +1,11 @@
 ---
-- name: Verify autorestic_config is defined for this host
+- name: Verify backup is configured for this host
   ansible.builtin.fail:
     msg: >
-      autorestic_config is not defined for {{ inventory_hostname }}.
-      Create inventories/prod/host_vars/{{ inventory_hostname }}/autorestic.yml
-      and set the autorestic_config variable there.
-  when: autorestic_config is not defined
+      autorestic_configured is false for {{ inventory_hostname }}.
+      Define autorestic_config in host_vars/{{ inventory_hostname }}/autorestic.yml
+      and set autorestic_configured: true there.
+  when: not autorestic_configured | bool
 
 - name: Deploy autorestic hooks script
   ansible.builtin.template:
