@@ -1,12 +1,15 @@
 ---
 - name: Create stack directories
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ dir }}"
     state: directory
     mode: "0755"
   loop:
     - "/var/data/config/{{ stack_name }}"
     - "/var/data/containers/{{ stack_name }}"
+    - "/etc/caddy/sites"
+  loop_control:
+    loop_var: dir
 
 - name: Render compose file
   ansible.builtin.template:

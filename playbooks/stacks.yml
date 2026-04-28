@@ -4,6 +4,33 @@
 - name: Re-deploy compose stacks on docker hosts
   hosts: docker_hosts
   gather_facts: true
+  pre_tasks:
+    - name: Check docker CLI is available
+      ansible.builtin.command: docker compose version
+      register: docker_compose_check
+      changed_when: false
+      failed_when: false
+
+    - name: Abort if docker compose is missing
+      when: docker_compose_check.rc != 0
+      block:
+        - name: Print prerequisite hint
+          ansible.builtin.debug:
+            msg: |
+              ┌─────────────────────────────────────────────────────────┐
+              │  Docker Compose is not installed on {{ inventory_hostname }}
+              │
+              │  Run the full setup first:
+              │    make docker_hosts HOST={{ inventory_hostname }}
+              │
+              │  This installs Docker, Caddy, and all prerequisites.
+              │  Afterwards, use 'make stacks' for incremental deploys.
+              └─────────────────────────────────────────────────────────┘
+
+        - name: Fail
+          ansible.builtin.fail:
+            msg: "Prerequisites missing on {{ inventory_hostname }} — see hint above."
+
   tasks:
     - name: Deploy stacks declared on this host
       ansible.builtin.include_role:
@@ -11,4 +38,4 @@
       vars:
         stack_name: "{{ item }}"
       loop: "{{ stacks | default([]) }}"
-      tags: ["{{ item }}", stacks]
+      tags: [stacks]

@@ -13,4 +13,4 @@
       vars:
         stack_name: "{{ item }}"
       loop: "{{ stacks | default([]) }}"
-      tags: ["{{ item }}", stacks]
+      tags: [stacks]
