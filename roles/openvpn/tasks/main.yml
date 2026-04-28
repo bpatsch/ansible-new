@@ -1,0 +1,74 @@
+---
+- name: Install openvpn packages
+  ansible.builtin.apt:
+    name:
+      - openvpn
+      - openssl
+      - zip
+    state: present
+    update_cache: true
+
+- name: Create easy-rsa dir
+  ansible.builtin.command:
+    cmd: make-cadir /etc/openvpn/easy-rsa
+    creates: /etc/openvpn/easy-rsa
+
+- name: Enable IP forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: true
+    state: present
+
+- name: Stat existing server.conf
+  ansible.builtin.stat:
+    path: /etc/openvpn/server.conf
+  register: openvpn_server_conf
+
+- name: Preserve original server.conf
+  ansible.builtin.copy:
+    src: /etc/openvpn/server.conf
+    dest: /etc/openvpn/server.conf.orig
+    remote_src: true
+    force: false
+    mode: "0644"
+  when: openvpn_server_conf.stat.isreg | default(false)
+
+- name: Render config files
+  ansible.builtin.template:
+    src: "{{ item.file }}"
+    dest: "/etc/{{ item.file }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { file: openvpn/server.conf, mode: "0644" }
+    - { file: openvpn/up.sh,       mode: "0755" }
+    - { file: openvpn/down.sh,     mode: "0755" }
+  notify: Reload OpenVPN service
+  tags: [vpn]
+
+- name: Create key directory
+  ansible.builtin.file:
+    path: /etc/openvpn/keys
+    state: directory
+    mode: "0755"
+  tags: [vpn]
+
+- name: Copy VPN keys
+  ansible.builtin.copy:
+    src: "etc/openvpn/keys/{{ item.name }}"
+    dest: "/etc/openvpn/keys/{{ item.name }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { name: server.crt,  mode: "0644" }
+    - { name: server.key,  mode: "0600" }
+    - { name: ca.crt,      mode: "0644" }
+    - { name: dh2048.pem,  mode: "0644" }
+    - { name: ta.key,      mode: "0600" }
+  tags: [vpn]
+
+- name: Enable and start openvpn
+  ansible.builtin.systemd:
+    name: openvpn@server
+    enabled: true
+    state: started
+  tags: [vpn]

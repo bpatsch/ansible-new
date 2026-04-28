@@ -1,4 +1,3 @@
 ---
 ansible_user: ansible
-ansible_port: 2222
 ansible_become: true

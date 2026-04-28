@@ -1,0 +1,6 @@
+---
+brscan_scanner_name: "{{ vault_brscan_scanner_name }}"
+brscan_scanner_model: "{{ vault_brscan_scanner_model }}"
+brscan_scanner_ip: "{{ vault_brscan_scanner_ip }}"
+brscan_username: "{{ vault_brscan_username }}"
+brscan_password: "{{ vault_brscan_password }}"

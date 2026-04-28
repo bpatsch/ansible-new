@@ -1,0 +1,16 @@
+[Unit]
+Description=Brother scan-key-tool
+After=network.target
+After=syslog.target
+
+[Service]
+User=root
+Type=forking
+ExecStart=/opt/brother/scanner/brscan-skey/brscan-skey
+ExecStop=/opt/brother/scanner/brscan-skey/brscan-skey --terminate
+WorkingDirectory=/tmp
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

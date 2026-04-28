@@ -1,0 +1,183 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks/main.yml file for the Brother Scanner and ImageMagick Role
+#
+# Ensure all tasks run with elevated privileges (sudo/root)
+
+- name: Ensure role runs on x86_64 architecture
+  fail:
+    msg: "This role must be run on x86_64 architecture"
+  when: ansible_facts['architecture'] != "x86_64"
+
+- name: Ensure role runs as root user
+  fail:
+    msg: "This role must be run with root privileges! Set 'become: true' in the playbook."
+  when: ansible_user_id != 'root'
+
+- name: Ensure mandatory variables are defined
+  ansible.builtin.assert:
+    that:
+      - brscan_username is defined
+      - brscan_password is defined
+      - brscan_scanner_name is defined
+      - brscan_scanner_model is defined
+      - brscan_scanner_ip is defined
+
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+  tags:
+    - packages
+
+- name: Install required apt packages (smbclient, pngtools)
+  ansible.builtin.apt:
+    name:
+      - smbclient
+      - cifs-utils
+      - sane-utils
+      - pngtools
+      - netpbm
+      - libharfbuzz0b
+    state: present
+  tags:
+    - packages
+
+- name: Download Brother brscan4 .deb package
+  ansible.builtin.get_url:
+    url: https://download.brother.com/welcome/dlf105200/brscan4-0.4.11-1.amd64.deb
+    dest: /tmp/brscan4-0.4.11-1.amd64.deb
+    mode: "0644" # Ensure correct permissions for the downloaded file
+  tags:
+    - brother_scanner
+
+- name: Download Brother brscan-skey .deb package
+  ansible.builtin.get_url:
+    url: https://download.brother.com/welcome/dlf006652/brscan-skey-0.3.4-0.amd64.deb
+    dest: /tmp/brscan-skey-0.3.4-0.amd64.deb
+    mode: "0644"
+  tags:
+    - brother_scanner
+
+- name: Install Brother brscan4 .deb package
+  ansible.builtin.apt:
+    deb: /tmp/brscan4-0.4.11-1.amd64.deb
+    state: present
+  tags:
+    - brother_scanner
+
+- name: Install Brother brscan-skey .deb package
+  ansible.builtin.apt:
+    deb: /tmp/brscan-skey-0.3.4-0.amd64.deb
+    state: present
+  tags:
+    - brother_scanner
+
+- name: Download recent ImageMagick AppImage
+  ansible.builtin.get_url:
+    url: https://imagemagick.org/archive/binaries/magick
+    dest: /tmp/magick # Download to a temporary location first
+    mode: "0644"
+  tags:
+    - imagemagick
+
+- name: Move ImageMagick AppImage to /usr/local/bin/
+  ansible.builtin.copy:
+    src: /tmp/magick # Source is on the remote host (the target machine)
+    dest: /usr/local/bin/magick
+    remote_src: true # Important: tells Ansible to look for src on the remote host
+    owner: root
+    group: root
+    mode: "0755" # Set executable permissions
+  tags:
+    - imagemagick
+
+- name: Find scanto*.config files to modify resolution
+  ansible.builtin.find:
+    paths: /opt/brother/scanner/brscan-skey/
+    patterns: "scanto*.config"
+    file_type: file
+  register: config_files_to_modify
+  tags:
+    - brother_scanner
+
+- name: Change resolution=100 to resolution=300 in scanto*.config files
+  ansible.builtin.replace:
+    path: "{{ item.path }}" # Path to the file found by the find module
+    regexp: "^resolution=100" # Regex to match the start of the line with resolution=100
+    replace: "resolution=300" # The replacement string
+  loop: "{{ config_files_to_modify.files }}" # Loop over each file found
+  when: config_files_to_modify.files | length > 0 # Only run if files were found
+  tags:
+    - brother_scanner
+
+# DEBUG
+#- name: Display found config files
+#  ansible.builtin.debug:
+#    msg: "Found config file: {{ item.path }}"
+#  loop: "{{ config_files_to_modify.files }}"
+#  when: config_files_to_modify.matched > 0
+
+- name: Create /etc/smbcredentials file
+  ansible.builtin.copy:
+    dest: /etc/smbcredentials
+    owner: root
+    group: root
+    mode: "0600" # Set permissions to read/write for owner only
+    content: |
+      username={{ brscan_username }}
+      password={{ brscan_password }}
+  tags:
+    - smb
+    - brother_scanner
+
+- name: Check if scanner is already registered
+  ansible.builtin.command: '/usr/bin/brsaneconfig4 -q | grep "^*"'
+  register: brscan_scanner_query_result
+  changed_when: false # This command doesn't change anything, so no change reported
+
+#- name: Debug
+#  debug:
+#    var: brscan_scanner_query_result
+#    verbosity: 0
+
+- name: brscanconfig4 - add scanner if not registered
+  ansible.builtin.command: '/usr/bin/brsaneconfig4 -a name="{{ brscan_scanner_name }}" model="{{ brscan_scanner_model }}" ip="{{ brscan_scanner_ip }}"'
+  when: brscan_scanner_name not in brscan_scanner_query_result.stdout
+
+- name: Copy scantofile.sh script
+  ansible.builtin.copy:
+    src: scantofile.sh
+    dest: /opt/brother/scanner/brscan-skey/script/scantofile.sh
+    owner: root
+    group: root
+    mode: "0755"
+  tags:
+    - brother_scanner
+    - script
+
+- name: systemd related block of tasks
+  become: true
+  block:
+    - name: Create brscan-skey systemd unit file
+      ansible.builtin.copy:
+        src: brscan-skey.service
+        dest: /etc/systemd/system/brscan-skey.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: brscan_restart
+      register: brscan_systemd_unit_created
+
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+      when: brscan_systemd_unit_created is defined and brscan_systemd_unit_created.changed == true
+
+    - name: Start brscan-skey and activate it on boot
+      ansible.builtin.systemd_service:
+        name: brscan-skey
+        enabled: true
+        state: started
+      when: brscan_systemd_unit_created is defined
+  tags:
+    - systemd

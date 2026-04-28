@@ -1,0 +1,6 @@
+---
+- name: Deploy OpenVPN server on hetzner01
+  hosts: hetzner01
+  gather_facts: true
+  roles:
+    - openvpn
