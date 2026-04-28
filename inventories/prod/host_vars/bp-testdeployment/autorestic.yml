@@ -86,6 +86,7 @@ autorestic_config:
         - '**.vmdk'
         - 'home/*/.vagrant.d/**'
         - '/data/.plain/**'
+        - '/var/data/bookstack-data/**/'
 
     hooks: &global_hooks
       before:
@@ -110,21 +111,10 @@ autorestic_config:
         - scaleway-s3
       options:
         backup:
-          exclude:
-            - '/home/*/Trash'
-            - '/home/Projects/Completed'
-            - '/**.DS_Store'
-            - '**/**Icon?'
-            - '/**.AppleDouble'
-            - '/var/data/bookstack-data/**/'
+          <<: *global_excludes
       cron: '0 0 * * *'       # Every Day at 0:00
-
       hooks:
         <<: *global_hooks
-      options:
-        backup:
-          <<: *global_excludes
-      cron: '0 0 * * *'
 
   backends:
     scaleway-s3:

@@ -115,6 +115,7 @@ Also migrate:
 
 ## Status
 
-- [ ] Step 1: Scaffold directory skeleton
-- [ ] Step 2: Migrate roles/common/
-- [ ] Step 3: Validate with lint + syntax check
+- [x] Step 1: Scaffold directory skeleton
+- [x] Step 2: Migrate roles/common/
+- [x] Step 3: Validate with lint + syntax check
+- [x] Step 4: Bootstrap bp-testdeployment successfully (packages-first ordering, cron fix, autorestic guard)
