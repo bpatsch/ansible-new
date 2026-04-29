@@ -1,0 +1,6 @@
+---
+brscan_scanner_name: Brother_MFC-L2710DW_series
+brscan_scanner_model: MFC-L2710DW
+brscan_scanner_ip: 192.168.8.239
+brscan_username: "{{ vault_brscan_username }}"
+brscan_password: "{{ vault_brscan_password }}"
