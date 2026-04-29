@@ -140,7 +140,7 @@
 #    var: brscan_scanner_query_result
 #    verbosity: 0
 
-- name: brscanconfig4 - add scanner if not registered
+- name: Brscanconfig4 - add scanner if not registered
   ansible.builtin.command: '/usr/bin/brsaneconfig4 -a name="{{ brscan_scanner_name }}" model="{{ brscan_scanner_model }}" ip="{{ brscan_scanner_ip }}"'
   when: brscan_scanner_name not in brscan_scanner_query_result.stdout
 
@@ -155,8 +155,10 @@
     - brother_scanner
     - script
 
-- name: systemd related block of tasks
+- name: Systemd related block of tasks
   become: true
+  tags:
+    - systemd
   block:
     - name: Create brscan-skey systemd unit file
       ansible.builtin.copy:
@@ -165,13 +167,13 @@
         owner: root
         group: root
         mode: "0644"
-      notify: brscan_restart
+      notify: Brscan restart
       register: brscan_systemd_unit_created
 
     - name: Reload systemd
       ansible.builtin.systemd_service:
         daemon_reload: true
-      when: brscan_systemd_unit_created is defined and brscan_systemd_unit_created.changed == true
+      when: brscan_systemd_unit_created is defined and brscan_systemd_unit_created.changed
 
     - name: Start brscan-skey and activate it on boot
       ansible.builtin.systemd_service:
@@ -179,5 +181,3 @@
         enabled: true
         state: started
       when: brscan_systemd_unit_created is defined
-  tags:
-    - systemd
