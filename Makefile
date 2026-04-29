@@ -4,18 +4,20 @@
 
 ENV       ?= prod
 HOST      ?=
+GROUP     ?=
 INVENTORY := inventories/$(ENV)
 PLAYBOOK  := ansible-playbook -i $(INVENTORY)
 
-# Optional limit fragment: only added when HOST is set
-LIMIT     := $(if $(HOST),--limit $(HOST),)
+# Limit fragment: HOST takes precedence over GROUP; both are optional for
+# explicit lifecycle targets (run, ping) but required for the catch-all.
+LIMIT     := $(if $(HOST),--limit $(HOST),$(if $(GROUP),--limit $(GROUP),))
 
 .PHONY: help ping run first-run bootstrap stacks lint syntax check \
         scaffold-hosts requirements vault-edit vault-create
 
 # ---- Help (default target) -------------------------------------------------
 help:
-	@echo "Usage: make <target> [ENV=prod|test] [HOST=<name>]"
+	@echo "Usage: make <target> [ENV=prod|test] [HOST=<name>|GROUP=<group>]"
 	@echo ""
 	@echo "Lifecycle:"
 	@echo "  first-run HOST=<name>   Bootstrap a fresh host (connect as root)"
@@ -102,9 +104,16 @@ endif
 	ansible-vault edit $(FILE)
 
 # ---- Catch-all: dispatch to playbook OR tag --------------------------------
-# `make backup`        -> site.yml --tags backup
-# `make paperless-ngx` -> site.yml --tags paperless-ngx
+# HOST or GROUP is required — implicit all-host runs are not allowed.
+# `make brscan HOST=bp-testdeployment`  -> playbooks/brscan.yml --limit bp-testdeployment
+# `make backup GROUP=docker_hosts`      -> site.yml --tags backup --limit docker_hosts
 %:
+	@if [ -z "$(LIMIT)" ]; then \
+	    echo "Error: HOST or GROUP is required."; \
+	    echo "  make $@ HOST=<hostname>"; \
+	    echo "  make $@ GROUP=<group>"; \
+	    exit 1; \
+	fi
 	@if [ -f playbooks/$@.yml ]; then \
 	    $(PLAYBOOK) playbooks/$@.yml $(LIMIT); \
 	else \

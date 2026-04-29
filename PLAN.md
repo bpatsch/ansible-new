@@ -119,3 +119,5 @@ Also migrate:
 - [x] Step 2: Migrate roles/common/
 - [x] Step 3: Validate with lint + syntax check
 - [x] Step 4: Bootstrap bp-testdeployment successfully (packages-first ordering, cron fix, autorestic guard)
+- [x] Step 5: Migrate brscan and openvpn roles from to_migrate/; add hetzner01 to inventory
+- [x] Step 6: Makefile catch-all guard — HOST or GROUP required; implicit all-host runs blocked

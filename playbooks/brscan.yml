@@ -1,6 +1,6 @@
 ---
-- name: Deploy Brother scanner integration on p-docker01
-  hosts: p-docker01
+- name: Deploy Brother scanner integration
+  hosts: all
   gather_facts: true
   roles:
     - brscan
