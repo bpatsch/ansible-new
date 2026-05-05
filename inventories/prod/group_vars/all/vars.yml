@@ -1,4 +1,14 @@
 ---
+# Environment
+environment_name: prod
+
+# Global variables
+ansible_user: ansible
+ansible_become: true
+
+# Variables common to all docker hosts (prod)
+docker_data_root: /var/data
+
 # Base package list installed on every host. Extend per-host/group with extra_packages.
 common_packages:
   - vim
@@ -72,3 +82,13 @@ system_locales:
   - en_US.UTF-8
   - de_DE.UTF-8
 system_timezone: Europe/Vienna
+
+# OpenVPN Server settings
+openvpn_port: 4300
+openvpn_proto: udp6
+openvpn_network_addr: "10.9.0.0"
+openvpn_network_mask: "255.255.255.0"
+openvpn_networks: []
+openvpn_push_dns: []
+openvpn_domains: []
+openvpn_use_updown_scripts: false

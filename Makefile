@@ -55,7 +55,7 @@ ifndef HOST
 endif
 	$(PLAYBOOK) playbooks/bootstrap.yml \
 	    --limit $(HOST) \
-	    --extra-vars "@$(INVENTORY)/host_vars/$(HOST)/bootstrap.yml"
+	    --extra-vars "@$(INVENTORY)/group_vars/all/bootstrap.yml"
 
 bootstrap: first-run
 
@@ -79,15 +79,14 @@ lint:
 syntax:
 	$(PLAYBOOK) playbooks/site.yml --syntax-check
 
-# Scaffold a new host: requires HOST=<name>; creates host_vars/<HOST>/{vars,bootstrap}.yml
+# Scaffold a new host: requires HOST=<name>; creates host_vars/<HOST>/{vars.yml}
 scaffold-hosts:
 ifndef HOST
 	$(error HOST is required: make scaffold-hosts HOST=<name>)
 endif
 	@mkdir -p $(INVENTORY)/host_vars/$(HOST)
 	@cp -n templates/host_vars.yml.j2  $(INVENTORY)/host_vars/$(HOST)/vars.yml
-	@cp -n templates/bootstrap.yml.j2  $(INVENTORY)/host_vars/$(HOST)/bootstrap.yml
-	@echo "Created $(INVENTORY)/host_vars/$(HOST)/{vars.yml,bootstrap.yml}"
+	@echo "Created $(INVENTORY)/host_vars/$(HOST)/{vars.yml}"
 	@echo "Now add '$(HOST):' under the right group in $(INVENTORY)/hosts.yml"
 
 # ---- Vault helpers ---------------------------------------------------------

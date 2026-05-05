@@ -1,6 +1,5 @@
 ---
-ansible_user: bpatsch
-ansible_become: true
+
 ansible_host: 172.160.244.205
 ssh_port: 22
 admin_user: bpatsch
