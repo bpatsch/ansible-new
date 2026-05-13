@@ -1,9 +1,12 @@
 ---
+ansible_user: bpatsch
+
 stacks:
   - gatus
 
 gatus:
-  domain: status.example.com
+  domain: hex.bpatsch-it.net
+  port: 9000
 
 # Scaleway S3 credentials — aliased from vault
 scaleway_access_key_id: "{{ vault_scaleway_access_key_id }}"

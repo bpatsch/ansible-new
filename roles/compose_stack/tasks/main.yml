@@ -32,13 +32,9 @@
     mode: "0644"
   notify: Reload Caddy
 
-- name: Render stack config file
-  ansible.builtin.template:
-    src: "{{ playbook_dir }}/../stacks/{{ stack_name }}/config.yml.j2"
-    dest: "/var/data/config/{{ stack_name }}/config.yml"
-    mode: "0644"
-  when: (playbook_dir + '/../stacks/' + stack_name + '/config.yml.j2') is file
-  notify: "Restart {{ stack_name }}"
+- name: Run stack-specific tasks
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/../stacks/{{ stack_name }}/tasks.yml"
+  when: (playbook_dir + '/../stacks/' + stack_name + '/tasks.yml') is file
 
 - name: Bring stack up
   community.docker.docker_compose_v2:
