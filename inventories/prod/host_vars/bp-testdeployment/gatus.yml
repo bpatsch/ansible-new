@@ -28,33 +28,32 @@ gatus_endpoint_groups:
     hosts:
       - booking.casablanca.at
       - bookingengine.casablanca.at
-      - changelog.casablanca.at
       - cloud.casablanca.at
-      - docs.casablanca.at
       - frontend.casablanca.at
       - guestapp.casablanca.at
       - ibe.casablanca.at
       - install.casablanca.at
       - interface.casablanca.at
-      - it-support.casablanca.at
       - my.casablanca.at
       - online.casablanca.at
       - research.casablanca.at
       - s1.casablanca.at
       - status.casablanca.at
-      - www.casablanca.at
 
   - name: prod-slow
     interval: 5m
     url_scheme: https
     response_time: 5000
     hosts:
+      - changelog.casablanca.at
       - connectivity.casablanca.at
+      - docs.casablanca.at
       - go.casablanca.at
       - academy.casablanca.at
       - intern.academy.casablanca.at
       - partner.academy.casablanca.at
       - rookie.academy.casablanca.at
+      - www.casablanca.at
 
   - name: infra
     interval: 5m
