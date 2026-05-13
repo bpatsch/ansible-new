@@ -83,6 +83,10 @@ system_locales:
   - de_DE.UTF-8
 system_timezone: Europe/Vienna
 
+# Gatus defaults
+gatus:
+  port: 9000
+
 # OpenVPN Server settings
 openvpn_port: 4300
 openvpn_proto: udp6
