@@ -1,3 +1,31 @@
+# {{ ansible_managed }}
 {{ gatus.domain }} {
-	reverse_proxy localhost:8080
+  @api path /api/*
+
+  route @api {
+    reverse_proxy http://localhost:{{ gatus.port | default(8080) }} {
+      header_up Host {host}
+      header_up X-Real-IP {remote_host}
+      header_up X-Forwarded-For {remote_host}
+      header_up X-Forwarded-Proto {scheme}
+      flush_interval -1
+    }
+  }
+
+  route {
+    authorize with user_policy
+    reverse_proxy http://localhost:{{ gatus.port | default(8080) }} {
+      header_up Host {host}
+      header_up X-Real-IP {remote_host}
+      header_up X-Forwarded-For {remote_host}
+      header_up X-Forwarded-Proto {scheme}
+      flush_interval -1
+    }
+  }
+
+  log {
+    level INFO
+    output stdout
+    format console
+  }
 }

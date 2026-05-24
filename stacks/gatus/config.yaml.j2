@@ -16,6 +16,10 @@ alerting:
   {{ alerting | to_nice_yaml(indent=2) | indent(2) }}
 {% endif %}
 
+{% if gatus_external_endpoints is defined %}
+external-endpoints:
+{{ gatus_external_endpoints | to_nice_yaml(indent=2, sort_keys=False) | indent(2, first=True) }}
+{% endif %}
 
 endpoints:
 {% for g in gatus_endpoint_groups %}

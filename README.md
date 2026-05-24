@@ -103,6 +103,14 @@ make vault-create FILE=inventories/prod/group_vars/all/vault.yml ENV=prod
 3. Add any secrets to that host's `vault.yml` and alias in `vars.yml`
 4. Deploy: `make <stack> HOST=<host>`
 
+## Gatus
+
+### Push external endpoint heartbeat (backup)
+
+```bash
+/tmp/gatus-cli/gatus-cli-linux-amd64 external-endpoint push --url https://hex.bpatsch-it.net --key infra_backup --token $vault_gatus_external_backup_token --success >&1
+```
+
 ## Installing Galaxy dependencies
 
 ```bash

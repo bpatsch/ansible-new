@@ -1,0 +1,29 @@
+---
+alerting:
+  teams-workflows:
+    webhook-url: "{{ vault_gatus_teams_webhook_url }}"
+    client:
+      insecure: false
+    default-alert:
+      description: "healthcheck failed"
+      send-on-resolved: true
+      failure-threshold: 3
+      success-threshold: 2
+
+  ntfy:
+    topic: "{{ vault_gatus_ntfy_infra_topic }}"
+    default-alert:
+      description: "healthcheck failed"
+      send-on-resolved: true
+      failure-threshold: 3
+      success-threshold: 2
+
+gatus_external_endpoints:
+  - name: Backup NAS
+    group: infra
+    token: "{{ vault_gatus_external_backup_token }}"
+    heartbeat:
+      interval: 48h
+    alerts:
+      - type: ntfy
+      - type: teams-workflows
