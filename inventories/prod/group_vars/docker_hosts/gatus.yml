@@ -23,7 +23,10 @@ gatus_external_endpoints:
     group: infra
     token: "{{ vault_gatus_external_backup_token }}"
     heartbeat:
-      interval: 48h
+      interval: 10m
     alerts:
+      # failure-threshold is overridden to 1 in the template for all external endpoints.
+      # External endpoints are event-driven, not polled — only state transitions generate
+      # results, so there is no repeated failure accumulation across intervals.
       - type: ntfy
       - type: teams-workflows

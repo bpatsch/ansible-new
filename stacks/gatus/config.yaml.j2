@@ -18,7 +18,25 @@ alerting:
 
 {% if gatus_external_endpoints is defined %}
 external-endpoints:
-{{ gatus_external_endpoints | to_nice_yaml(indent=2, sort_keys=False) | indent(2, first=True) }}
+{% for ep in gatus_external_endpoints %}
+  - name: {{ ep.name }}
+    group: {{ ep.group }}
+    token: "{{ ep.token }}"
+{% if ep.heartbeat is defined %}
+    heartbeat:
+      interval: {{ ep.heartbeat.interval }}
+{% endif %}
+{% if ep.alerts is defined %}
+    alerts:
+{# failure-threshold: 1 — external endpoints are event-driven, not polled.
+   Only state transitions generate results; there is no repeated failure
+   accumulation across intervals, so a threshold of 1 fires immediately. #}
+{% for alert in ep.alerts %}
+      - type: {{ alert.type }}
+        failure-threshold: 1
+{% endfor %}
+{% endif %}
+{% endfor %}
 {% endif %}
 
 endpoints:
