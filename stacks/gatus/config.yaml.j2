@@ -34,6 +34,7 @@ external-endpoints:
 {% for alert in ep.alerts %}
       - type: {{ alert.type }}
         failure-threshold: 1
+        success-threshold: 1
 {% endfor %}
 {% endif %}
 {% endfor %}
