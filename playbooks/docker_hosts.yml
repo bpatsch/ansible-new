@@ -8,9 +8,11 @@
     - caddy
   tasks:
     - name: Deploy stacks declared on this host
-      ansible.builtin.include_role:
-        name: compose_stack
-      vars:
-        stack_name: "{{ item }}"
-      loop: "{{ stacks | default([]) }}"
+      block:
+        - ansible.builtin.include_role:
+            name: compose_stack
+          vars:
+            stack_name: "{{ item }}"
+          loop: "{{ stacks | default([]) }}"
       tags: [stacks]
+      become: yes
