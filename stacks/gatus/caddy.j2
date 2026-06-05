@@ -13,7 +13,7 @@
   }
 
   route {
-    authorize with user_policy
+    authorize with gatus_policy 
     reverse_proxy http://localhost:{{ gatus.port | default(8080) }} {
       header_up Host {host}
       header_up X-Real-IP {remote_host}
