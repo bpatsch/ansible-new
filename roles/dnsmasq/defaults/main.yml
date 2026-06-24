@@ -1,0 +1,11 @@
+---
+dnsmasq_oisd_enabled: true
+dnsmasq_oisd_url: "https://big.oisd.nl/dnsmasq2"
+dnsmasq_oisd_dest: "/etc/dnsmasq.d/oisd-blocklist.conf"
+dnsmasq_oisd_script_path: "/usr/local/bin/oisd-update.sh"
+dnsmasq_oisd_cron_hour: "3"
+dnsmasq_oisd_cron_minute: "0"
+dnsmasq_oisd_whitelist: []
+
+dnsmasq_test_hostname: ""
+dnsmasq_test_expected_ip: ""

@@ -9,3 +9,23 @@
     name: dnsmasq
     enabled: true
     state: started
+
+- name: Apply dnsmasq configuration
+  ansible.builtin.include_tasks: config.yml
+
+- name: Configure OISD blocklist
+  ansible.builtin.include_tasks: oisd.yml
+  when: dnsmasq_oisd_enabled
+
+- name: Validate DNS resolution
+  when: dnsmasq_test_hostname | length > 0
+  block:
+    - name: Query test hostname
+      ansible.builtin.command: "host {{ dnsmasq_test_hostname }}"
+      register: dns_result
+      changed_when: false
+
+    - name: Assert expected IP in response
+      ansible.builtin.assert:
+        that: dnsmasq_test_expected_ip in dns_result.stdout
+      when: not ansible_check_mode

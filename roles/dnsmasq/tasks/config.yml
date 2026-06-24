@@ -1,0 +1,41 @@
+---
+- name: Copy dnsmasq local configuration
+  ansible.builtin.copy:
+    src: local.conf
+    dest: /etc/dnsmasq.d/local.conf
+    mode: "0644"
+  register: r_local_conf
+
+- name: Add custom hosts to /etc/hosts
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: "{{ lookup('file', role_path + '/files/hosts') }}"
+  register: r_hosts
+
+- name: Ensure dnsmasq reads conf.d directory
+  ansible.builtin.blockinfile:
+    path: /etc/dnsmasq.conf
+    block: "conf-dir=/etc/dnsmasq.d/,*.conf"
+  register: r_confd
+
+- name: Validate dnsmasq configuration
+  ansible.builtin.command: dnsmasq --test
+  changed_when: false
+  failed_when: false
+  register: r_test
+  when: r_local_conf.changed or r_hosts.changed or r_confd.changed
+
+- name: Report dnsmasq configuration error
+  ansible.builtin.debug:
+    msg: "ERROR: dnsmasq --test failed:\n{{ r_test.stderr }}"
+  when:
+    - not (r_test.skipped | default(false))
+    - r_test.rc != 0
+
+- name: Restart dnsmasq
+  ansible.builtin.systemd:
+    name: dnsmasq
+    state: restarted
+  when:
+    - not (r_test.skipped | default(false))
+    - r_test.rc == 0

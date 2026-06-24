@@ -4,3 +4,6 @@
 
 - name: Apply docker/caddy/stacks to docker_hosts
   import_playbook: docker_hosts.yml
+
+- name: Apply dnsmasq to dnsmasq_hosts
+  import_playbook: dnsmasq.yml

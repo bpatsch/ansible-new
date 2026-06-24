@@ -1,0 +1,24 @@
+---
+- name: Deploy OISD update script
+  ansible.builtin.template:
+    src: oisd-update.sh.j2
+    dest: "{{ dnsmasq_oisd_script_path }}"
+    mode: "0755"
+  register: oisd_script
+
+- name: Check if blocklist exists
+  ansible.builtin.stat:
+    path: "{{ dnsmasq_oisd_dest }}"
+  register: blocklist_stat
+
+- name: Run OISD update script
+  ansible.builtin.command: "{{ dnsmasq_oisd_script_path }}"
+  when: oisd_script.changed or not blocklist_stat.stat.exists
+  changed_when: true
+
+- name: Configure daily cron job for OISD blocklist update
+  ansible.builtin.cron:
+    name: oisd-blocklist-update
+    hour: "{{ dnsmasq_oisd_cron_hour }}"
+    minute: "{{ dnsmasq_oisd_cron_minute }}"
+    job: "{{ dnsmasq_oisd_script_path }}"
