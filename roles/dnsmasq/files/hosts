@@ -1,0 +1,12 @@
+
+192.168.8.242           pi pi.home pi.bpatsch-it.net homeassistant homeassistant.home homeassistant.bpatsch-it.net dash dash.home dash.bpatsch-it.net files files.home files.bpatsch-it.net oc oc.home oc.bpatsch-it.net monit monit.home monit.bpatsch-it.net
+192.168.8.119           hp hp.home hp.bpatsch-it.net
+192.168.8.222           p-docker01 p-docker01.bpatsch-it.net paperless paperless.home paperless.bpatsch-it.net search search.home search.bpatsch-it.net search2 search2.home search2.bpatsch-it.net auth-local auth-local.home auth-local.bpatsch-it.net status status.home status.bpatsch-it.net semaphore semaphore.home semaphore.bpatsch-it.net
+192.168.8.230           pve pve.home pve.bpatsch-it.net proxmox proxmox.home proxmox.bpatsch-it.net
+192.168.8.231           filer filer.home filer.bpatsch-it.net
+192.168.8.239           drucker drucker.home drucker.bpatsch-it.net
+192.168.8.251           nas nas.home nas.bpatsch-it.net cerberus cerberus.home cerberus.bpatsch-it.net
+130.61.17.197           wiki wiki.bpatsch-it.net auth auth.bpatsch-it.net saturn saturn.bpatsch-it.net hex hex.bpatsch-it.net bookmark bookmark.bpatsch-it.net
+116.203.46.95           hetzner01 hetzner01.bpatsch-it.net
+
+135.225.89.33  bp-test01.swedencentral.cloudapp.azure.com semaphore.tickets.bpatsch-it.net

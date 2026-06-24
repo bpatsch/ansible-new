@@ -1,0 +1,9 @@
+---
+dnsmasq_oisd_whitelist:
+  - adition.com
+  - px.staticfiles.at
+  - securepubads.g.doubleclick.net
+  - google.com
+
+dnsmasq_test_hostname: wiki
+dnsmasq_test_expected_ip: "130.61.17.197"

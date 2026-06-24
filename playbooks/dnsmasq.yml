@@ -1,0 +1,7 @@
+---
+- name: Apply dnsmasq role to dnsmasq_hosts
+  hosts: dnsmasq_hosts
+  become: true
+
+  roles:
+    - dnsmasq

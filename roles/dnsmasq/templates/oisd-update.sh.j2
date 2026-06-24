@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+DEST={{ dnsmasq_oisd_dest }}
+curl -sSf -R -z "$DEST" -o "$DEST" {{ dnsmasq_oisd_url }}
+{% for domain in dnsmasq_oisd_whitelist %}
+sed -i '/{{ domain }}/d' "$DEST"
+{% endfor %}
+if dnsmasq --test; then
+    systemctl restart dnsmasq
+else
+    echo "ERROR: dnsmasq configuration test failed. Skipping restart." >&2
+    exit 1
+fi
