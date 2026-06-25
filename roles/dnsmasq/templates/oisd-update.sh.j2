@@ -5,7 +5,7 @@ DEST={{ dnsmasq_oisd_dest }}
 {% for domain in dnsmasq_oisd_whitelist %}
 /usr/bin/sed -i '/{{ domain }}/d' "$DEST"
 {% endfor %}
-if /usr/sbin/dnsmasq --test; then
+if /usr/sbin/dnsmasq --test 2>/dev/null; then
     /usr/bin/systemctl restart dnsmasq
 else
     echo "ERROR: dnsmasq configuration test failed. Skipping restart." >&2
